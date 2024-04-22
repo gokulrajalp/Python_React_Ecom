@@ -13,7 +13,9 @@ body {
     /* Add more styles as needed */
   }
 
-
+  .scrollable-container::-webkit-scrollbar {
+    display: none;
+  }
 
   @media only screen and (min-width: 768px) {
     /* Your styles for larger screens go here */
@@ -52,7 +54,7 @@ body {
 
 
   .card-text-container {
-    height: 160px; 
+    height: auto; 
     overflow: hidden;
     justify-content: center;
   }
