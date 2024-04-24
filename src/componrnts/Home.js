@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "../assets/css/home.css";
-
+import { Modal, Button, Form } from 'react-bootstrap';  
 import { Scrollbars } from "react-custom-scrollbars-2";
+import RazorpayPayment from "./RazorpayPayment";
 
 const Home = () => {
   const [data, setData] = useState ([
@@ -104,7 +105,33 @@ const Home = () => {
     },
   ];
 
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   const [startIndex, setStartIndex] = useState(0);
+  const [payLoad, setPayLoad] = useState({
+    "id": 0,
+    "name": "",
+    "email": "",
+    "address": "",
+    "phone": "",
+    "land_mark": "",
+  "details": data,
+    "payment": 0,
+});
+
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setPayLoad({ ...payLoad, [name]: value });
+};
+
+const handleSubmit = () => {
+  // Handle form submission here, e.g., send data to server
+  console.log(payLoad);
+  handleClose();
+};
 
   const handleClick = () => {
     console.log("btn clk");
@@ -151,7 +178,11 @@ useEffect(()=>{
  
   };
   
+  const [paymentSuccess, setPaymentSuccess] = useState(null);
 
+  const handlePaymentSuccess = (success) => {
+    setPaymentSuccess(success);
+  };
 
 
   return (
@@ -170,6 +201,73 @@ useEffect(()=>{
     </div>
   <div></div>
 </nav>
+
+
+<Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Details </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="formName">
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter name"
+                name="name"
+                value={payLoad.name}
+                onChange={handleChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formPhone">
+              <Form.Label>Phone No</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter phone number"
+                name="phone"
+                value={payLoad.phone}
+                onChange={handleChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formEmail">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Enter email"
+                name="email"
+                value={payLoad.email}
+                onChange={handleChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formAddress">
+              <Form.Label>Address</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="Enter address"
+                name="address"
+                value={payLoad.address}
+                onChange={handleChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formLandmark">
+              <Form.Label>Landmark</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter landmark"
+                name="land_mark"
+                value={payLoad.land_mark}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleClose}>Edit Products</Button>
+          <RazorpayPayment amount={res.grandTotal} onSuccess={handlePaymentSuccess} />
+          {/* <Button variant="success" onClick={handleSubmit} >Proceed to Pay ₹{res.grandTotal}</Button> */}
+        </Modal.Footer>
+      </Modal>
 
       <div className="container">
         <h1 className="text-center m-4 mb-0">Available Products</h1>
@@ -321,7 +419,7 @@ useEffect(()=>{
         </Scrollbars>
       </div>
       <div className="fixed-bottom d-flex justify-content-end p-3">
-      <button type="button" className="btn btn-primary">Proceed to Buy</button>
+      <button type="button" className="btn btn-primary" onClick={handleShow}>Proceed to Buy</button>
     </div>
     </div>
   );
