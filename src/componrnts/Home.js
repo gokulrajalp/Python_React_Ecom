@@ -1,83 +1,42 @@
 import React, { useEffect, useState } from "react";
 import "../assets/css/home.css";
-import { Modal, Button, Form } from 'react-bootstrap';  
+import { Modal, Button, Form } from 'react-bootstrap';
 import { Scrollbars } from "react-custom-scrollbars-2";
 import RazorpayPayment from "./RazorpayPayment";
+import axios from 'axios';
 
 const Home = () => {
-  const [data, setData] = useState ([
-    {
-      "categoryName": "category 1",
-      "categoryId": 1,
-      "quantity" : 0,
-      "totalPrice":0,
-      "products": [
-        {
-          "id":1,
-          "imgFileName": "dubai-marina.png",
-          "title": "Product 1",
-          "price": 2,
-          "description": "Arabian Ranches offers a modern interpretation...",
-          "quantity" : 0,
-          "totalPrice":0,
-        },
-        {
-          "id":2,
-          "imgFileName": "dubai-marina.png",
-          "title": "Product 2",
-          "price": 10,
-          "description": "Arabian Ranches offers a modern interpretation...",
-          "quantity" : 0,
-          "totalPrice":0,
-        },
-        {
-          "id":3,
-          "imgFileName": "dubai-marina.png",
-          "title": "Product 3",
-          "price": 100,
-          "description": "The Centre of Now. The most prestigious square...",
-          "quantity" : 0,
-          "totalPrice":0,
+  const [data, setData] = useState([]);
+  const [img, setImg] = useState("");
+
+  useEffect(() => {
+    if (data.length == 0) {
+      const fetchData = async () => {
+        try {
+          const response = await fetch('https://d2ab-103-175-108-215.ngrok-free.app/feed/item/', {
+            headers: {
+              Accept: "application/json",
+              "ngrok-skip-browser-warning": "98547",
+            },
+          });
+          const imgresponse = await fetch('https://d2ab-103-175-108-215.ngrok-free.app/images/products/Bomb1_G6SfK4e.jpeg',{
+            headers: {
+              Accept: "application/json",
+              "ngrok-skip-browser-warning": "98547",
+            },
+          });
+          setImg(imgresponse.url)
+          let res = await response.json()
+          console.log("responce", res.data);
+          setData(res.data);
+        } catch (error) {
+        } finally {
         }
-      ]
-    },
-    {
-      "categoryName": "category 2",
-      "categoryId": 2,
-      "quantity" : 0,
-      "totalPrice":0,
-      products: [
-        {
-          "id":4,
-          "imgFileName": "dubai-marina.png",
-          "title": "Product 4",
-          "price": 50,
-          "description": "Sustainably designed, Dubai Hills Estate is...",
-          "quantity" : 0,
-          "totalPrice":0,
-        },
-        {
-          "id":5,
-          "imgFileName": "dubai-marina.png",
-          "title": "Product 5",
-          "price": 500,
-          "description": "Dubai Marina is one of the world’s largest...",
-          "quantity" : 0,
-          "totalPrice":0,
-        },
-        {
-          "id":6,
-          "imgFileName": "dubai-marina.png",
-          "title": "Product 6",
-          "price": 1000,
-          "description": "Launched in 2003, Emirates Living is a...",
-          "quantity" : 0,
-          "totalPrice":0,
-        }
-      ]
+      };
+      fetchData();
     }
-  ]);
-  
+  }, []);
+
   const banner = [
     {
       imgFileName: "dubai-marina.png",
@@ -117,130 +76,174 @@ const Home = () => {
     "address": "",
     "phone": "",
     "land_mark": "",
-  "details": data,
+    "details": [],
     "payment": 0,
-});
+    "paymentId":"",
+  });
 
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  setPayLoad({ ...payLoad, [name]: value });
-};
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPayLoad({ ...payLoad, [name]: value });
+  };
 
-const handleSubmit = () => {
-  // Handle form submission here, e.g., send data to server
-  console.log(payLoad);
-  handleClose();
-};
+  const handleSubmit = () => {
+    // Handle form submission here, e.g., send data to server
+    console.log(payLoad);
+    handleClose();
+  };
 
   const handleClick = () => {
     console.log("btn clk");
     setStartIndex((prevIndex) => (prevIndex + 3) % data.length);
   };
 
- const [res, setRes] = useState({"grandQuantity":0, "grandTotal":0})
+  const [resPrice, setRes] = useState({ "grandQuantity": 0, "grandTotal": 0 })
 
-useEffect(()=>{
-  let grandQuantity = 0;
-  let grandTotal = 0;
-  data.forEach((category)=>{
-    grandQuantity += category.quantity
-    grandTotal += category.totalPrice
-  })
-  setRes({"grandQuantity":grandQuantity, "grandTotal":grandTotal})
-},[data])
+  useEffect(() => {
+    let grandQuantity = 0;
+    let grandTotal = 0;
+    data.length>0 && data.forEach((category) => {
+      grandQuantity += category.quantity
+      grandTotal += category.total_price
+    })
+    setRes({ "grandQuantity": grandQuantity, "grandTotal": grandTotal })
+    setPayLoad(prevState => ({
+      ...prevState,
+      details: data
+    }))
+  }, [data])
 
-  const updateProduct = (categoryId, productId, quantity) => {
+  const updateProduct = (id, productId, quantity) => {
 
-   
-   setData(prevData => {
+
+    setData(prevData => {
       const newData = [...prevData];
-      
-  
+
+
       newData.forEach(category => {
-        if (category.categoryId && category.categoryId === categoryId) {
-          category.products.forEach(product => {
+        if (category.id && category.id === id) {
+          category.product.forEach(product => {
             if (product.id === productId) {
               product.quantity = quantity;
-              product.totalPrice = quantity * product.price;
+              product.total_price = quantity * product.original_price;
             }
           });
-  
-          category.quantity = category.products.reduce((acc, curr) => acc + parseInt(curr.quantity), 0);
-          category.totalPrice = category.products.reduce((acc, curr) => acc + curr.totalPrice, 0);
-          
-         
+
+          category.quantity = category.product.reduce((acc, curr) => acc + parseInt(curr.quantity), 0);
+          category.total_price = category.product.reduce((acc, curr) => {
+            // Parse total_price to a floating-point number
+            const totalPrice = parseFloat(curr.total_price);
+            
+            // Check if totalPrice is a valid number
+            if (!isNaN(totalPrice)) {
+                // Add totalPrice to accumulator
+                return acc + totalPrice;
+            } else {
+                // Handle invalid values (e.g., log error or skip)
+                console.error('Invalid total_price:', curr.total_price);
+                return acc;
+            }
+        }, 0);
         }
       });
-  
+
       return newData;
     });
- 
-  };
-  
-  const [paymentSuccess, setPaymentSuccess] = useState(null);
 
-  const handlePaymentSuccess = (success) => {
-    setPaymentSuccess(success);
+  };
+
+  const [paymentSuccess, setPaymentSuccess] = useState(null);
+  const [paymentId, setPaymentId] = useState(null);
+
+  const handlePaymentSuccess = (res) => {
+    setPaymentSuccess(res.res);
+    setPaymentId(res.msg);
+    if(res.res){
+      setShow(false);
+    }
+    alert("Order placed with payment ID :" + res.msg);
+    // window.location.reload();
+    const newpayload = payLoad;
+
+    newpayload.paymentId = res.msg;
+    newpayload.TotalPayment = resPrice.grandTotal;
+    newpayload.quantity = resPrice.grandQuantity;
+
+    axios.post('https://d2ab-103-175-108-215.ngrok-free.app/feed/order/', newpayload, {
+      headers: {
+        Accept: "application/json",
+        "ngrok-skip-browser-warning": "98547",
+      },
+    })
+      .then(response => {
+        console.log('POST request successful:', response);
+      })
+      .catch(error => {
+        console.error('Error making POST request:', error);
+      });
+
   };
 
 
   return (
     <div>
-    <nav class="navbar navbar-light bg-light sticky-top">
-  <a class="navbar-brand" href="#">
-    <img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="20" alt="MDB Logo" loading="lazy" />
-  </a>
-  <div>
-      <button type="button" className="btn btn-outline-primary border me-3">
-        Quantity: {res.grandQuantity}
-      </button>
-      <button type="button" className="btn btn-outline-primary border">
-        Total price: ₹{res.grandTotal}
-      </button>
-    </div>
-  <div></div>
-</nav>
+      <nav class="navbar navbar-light bg-light sticky-top">
+        <a class="navbar-brand" href="#">
+          <img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="20" alt="MDB Logo" loading="lazy" />
+        </a>
+        <div>
+          <button type="button" className="btn btn-outline-primary border me-3">
+            Quantity: {resPrice.grandQuantity}
+          </button>
+          <button type="button" className="btn btn-outline-primary border">
+            Total price: ₹{resPrice.grandTotal}
+          </button>
+        </div>
+        <div></div>
+      </nav>
 
-
-<Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Details </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group controlId="formName">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>Name *</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Enter name"
                 name="name"
                 value={payLoad.name}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
             <Form.Group controlId="formPhone">
-              <Form.Label>Phone No</Form.Label>
+              <Form.Label>Phone No *</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Enter phone number"
                 name="phone"
                 value={payLoad.phone}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
             <Form.Group controlId="formEmail">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>Email *</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="Enter email"
                 name="email"
                 value={payLoad.email}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
             <Form.Group controlId="formAddress">
-              <Form.Label>Address</Form.Label>
+              <Form.Label>Address *</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -248,6 +251,7 @@ useEffect(()=>{
                 name="address"
                 value={payLoad.address}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
             <Form.Group controlId="formLandmark">
@@ -264,59 +268,58 @@ useEffect(()=>{
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleClose}>Edit Products</Button>
-          <RazorpayPayment amount={res.grandTotal} onSuccess={handlePaymentSuccess} />
-          {/* <Button variant="success" onClick={handleSubmit} >Proceed to Pay ₹{res.grandTotal}</Button> */}
+          <RazorpayPayment amount={resPrice.grandTotal} onSuccess={handlePaymentSuccess} payLoad={payLoad}/>
         </Modal.Footer>
       </Modal>
 
       <div className="container">
         <h1 className="text-center m-4 mb-0">Available Products</h1>
 
-        
-    {data.map((category) => (
-  <div key={category.categoryId}>
-    {category.categoryName && <button type="button" className="btn btn-outline-primary mb-3 mt-5" style={{ width: "100%" }}>
-      {category.categoryName}
-    </button>}
-    <div className="d-flex justify-content-center align-items-center">
-      <div className="row g-5">
-        {category.products && category.products.map((item) => (
-          <div key={item.id} className="col-lg-4 col-md-6">
-            <div className="card rounded-0">
-              <img
-                src={require(`../assets/images/${item.imgFileName}`)}
-                className="card-img-top rounded-0"
-                alt="Card image"
-                style={{ height: "250px" }}
-              />
-              <div className="card-body">
-                <div className="card-text-container">
-                  <p className="card-text">{item.title}</p>
-                  <div className="d-flex justify-content-between">
-                    <p className="card-text">Actual Price : <span className="text-decoration-line-through text-danger">{item.price}</span></p>
-                    <p className="card-text" style={{ fontWeight: 'bold'}}>Discount Price : <span className="text-success">{item.price}</span></p>
-                  </div>
-                  {item.description && <div className="scrollable-container" style={{maxHeight: '4rem', overflowY: 'scroll', }}>
-                    <p className="card-text" style={{marginRight: '17px'}}>
-                      {item.description}
-                    </p>
-                  </div>}
-                </div>
-              </div>
 
-              <div className="d-flex justify-content-between m-2 align-items-center">
-                <button type="button" className="btn btn-primary" style={{ fontWeight: 'bold'}} onClick={() => updateProduct(category.categoryId, item.id, (item.quantity-1))}>-</button>
-                <input type="number" className="form-control" value={item.quantity} style={{ width: "100px" }} onChange={(e) => updateProduct(category.categoryId, item.id, e.target.value)}/>
-                <button type="button" className="btn btn-primary" style={{ fontWeight: 'bold'}} onClick={() =>updateProduct(category.categoryId, item.id, (item.quantity+1))}>+</button>
-                <p className="card-text">Total Price : {item.totalPrice}</p>
+        {data && data.map((category) => (
+          <div key={category.id}>
+            {category.category && <button type="button" className="btn btn-outline-primary mb-3 mt-5" style={{ width: "100%" }}>
+              {category.category}
+            </button>}
+            <div className="d-flex justify-content-center align-items-center">
+              <div className="row g-5">
+                {category.product && category.product.map((item) => (
+                  <div key={item.id} className="col-lg-4 col-md-6">
+                    <div className="card rounded-0">
+                      <img
+                        src={img}
+                        className="card-img-top rounded-0"
+                        alt="Card image"  
+                        style={{ height: "250px" }}
+                      />
+                      <div className="card-body">
+                        <div className="card-text-container">
+                          <p className="card-text">{item.title}</p>
+                          <div className="d-flex justify-content-between">
+                            <p className="card-text">Actual Price : <span className="text-decoration-line-through text-danger">{item.original_price}</span></p>
+                            <p className="card-text" style={{ fontWeight: 'bold' }}>Discount Price : <span className="text-success">{item.selling_price}</span></p>
+                          </div>
+                          {item.description && <div className="scrollable-container" style={{ maxHeight: '4rem', overflowY: 'scroll', }}>
+                            <p className="card-text" style={{ marginRight: '17px' }}>
+                              {item.description}
+                            </p>
+                          </div>}
+                        </div>
+                      </div>
+
+                      <div className="d-flex justify-content-between m-2 align-items-center">
+                        <button type="button" className="btn btn-primary" style={{ fontWeight: 'bold' }} disabled={item.quantity <= 0}  onClick={() => updateProduct(category.id, item.id, (item.quantity - 1))}>-</button>
+                        <input type="number" className="form-control" value={item.quantity} style={{ width: "100px" }} min={0} onChange={(e) => updateProduct(category.id, item.id, e.target.value)} />
+                        <button type="button" className="btn btn-primary" style={{ fontWeight: 'bold' }} onClick={() => updateProduct(category.id, item.id, (item.quantity + 1))}>+</button>
+                        <p className="card-text">Total Price : {item.total_price}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         ))}
-      </div>
-    </div>
-  </div>
-))}
 
 
         <h1
@@ -419,8 +422,8 @@ useEffect(()=>{
         </Scrollbars>
       </div>
       <div className="fixed-bottom d-flex justify-content-end p-3">
-      <button type="button" className="btn btn-primary" onClick={handleShow}>Proceed to Buy</button>
-    </div>
+        <button type="button" disabled={resPrice.grandTotal <= 0} className="btn btn-primary" onClick={handleShow}>Proceed to Buy</button>
+      </div>
     </div>
   );
 };
