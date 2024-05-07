@@ -287,7 +287,7 @@ const Home = () => {
                   <div key={item.id} className="col-lg-4 col-md-6">
                     <div className="card rounded-0">
                       <img
-                        src={img}
+                        src={`https://d2ab-103-175-108-215.ngrok-free.app${item.image}`}
                         className="card-img-top rounded-0"
                         alt="Card image"  
                         style={{ height: "250px" }}
