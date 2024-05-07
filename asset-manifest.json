@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/Python_React_Ecom/static/css/main.ffa8570c.css",
-    "main.js": "/Python_React_Ecom/static/js/main.fbc9db79.js",
+    "main.js": "/Python_React_Ecom/static/js/main.ab5a480e.js",
     "static/js/453.151daa23.chunk.js": "/Python_React_Ecom/static/js/453.151daa23.chunk.js",
     "static/media/Python_React_Ecom-gh-pages.zip": "/Python_React_Ecom/static/media/Python_React_Ecom-gh-pages.86b780b154ff46b0600e.zip",
     "static/media/arabian-ranches-ii.jpg": "/Python_React_Ecom/static/media/arabian-ranches-ii.d1c4dc3c439244b2c29b.jpg",
@@ -13,11 +13,11 @@
     "static/media/dubai-marina.png": "/Python_React_Ecom/static/media/dubai-marina.df8f40f772b165f5d919.png",
     "index.html": "/Python_React_Ecom/index.html",
     "main.ffa8570c.css.map": "/Python_React_Ecom/static/css/main.ffa8570c.css.map",
-    "main.fbc9db79.js.map": "/Python_React_Ecom/static/js/main.fbc9db79.js.map",
+    "main.ab5a480e.js.map": "/Python_React_Ecom/static/js/main.ab5a480e.js.map",
     "453.151daa23.chunk.js.map": "/Python_React_Ecom/static/js/453.151daa23.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ffa8570c.css",
-    "static/js/main.fbc9db79.js"
+    "static/js/main.ab5a480e.js"
   ]
 }
