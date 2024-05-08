@@ -5,6 +5,52 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import RazorpayPayment from "./RazorpayPayment";
 import axios from 'axios';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSync } from '@fortawesome/free-solid-svg-icons'
+
+
+
+
+const ImageLoader = ({ imageUrl }) => {
+  const [imageData, setImageData] = useState(null);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const response = await fetch(imageUrl, {
+          headers: {
+            Accept: "application/json",
+            "ngrok-skip-browser-warning": "98547",
+          },
+        });
+        const blob = await response.blob();
+        setImageData(blob);
+      } catch (error) {
+        console.error('Error fetching image:', error);
+      }
+    };
+
+    fetchImage();
+  }, [imageUrl]); // Dependency on imageUrl to fetch new image when it changes
+
+  return (
+    <div>
+      {imageData && (
+        <img
+          src={URL.createObjectURL(imageData)}
+          alt="Fetched Image"
+          style={{ maxHeight: '200px' }}
+        />
+      )}
+    </div>
+  );
+};
+
+
+
+
+
+
 const Home = () => {
   const [data, setData] = useState([]);
   const [img, setImg] = useState("");
@@ -13,19 +59,21 @@ const Home = () => {
     if (data.length == 0) {
       const fetchData = async () => {
         try {
-          const response = await fetch('https://d2ab-103-175-108-215.ngrok-free.app/feed/item/', {
+          const response = await fetch('https://f891-103-175-108-236.ngrok-free.app/feed/item/', {
             headers: {
               Accept: "application/json",
               "ngrok-skip-browser-warning": "98547",
             },
           });
-          const imgresponse = await fetch('https://d2ab-103-175-108-215.ngrok-free.app/images/products/Bomb1_G6SfK4e.jpeg',{
+          const imgresponse = await fetch('https://f891-103-175-108-236.ngrok-free.app/images/products/Bomb1_G6SfK4e.jpeg',{
             headers: {
               Accept: "application/json",
               "ngrok-skip-browser-warning": "98547",
             },
           });
-          setImg(imgresponse.url)
+          const blub = await imgresponse.blob();
+          setImg(blub);
+          console.log(imgresponse);
           let res = await response.json()
           console.log("responce", res.data);
           setData(res.data);
@@ -39,28 +87,28 @@ const Home = () => {
 
   const banner = [
     {
-      imgFileName: "dubai-marina.png",
-      title: "Service 1",
+      imgFileName: "1.jpeg",
+      title: "Diwali Sales",
     },
     {
-      imgFileName: "dubai-marina.png",
-      title: "Service 2",
+      imgFileName: "2.jpeg",
+      title: "light Up",
     },
     {
-      imgFileName: "dubai-marina.png",
-      title: "Service 3",
+      imgFileName: "3.jpeg",
+      title: "Diwali Sales",
     },
     {
-      imgFileName: "dubai-marina.png",
-      title: "Service 4",
+      imgFileName: "4.jpg",
+      title: "Fast Delivery",
     },
     {
-      imgFileName: "dubai-marina.png",
-      title: "Service 5",
+      imgFileName: "5.jpg",
+      title: "Safe Packing",
     },
     {
-      imgFileName: "dubai-marina.png",
-      title: "Service 6",
+      imgFileName: "6.png",
+      title: "Quality Product",
     },
   ];
 
@@ -81,6 +129,11 @@ const Home = () => {
     "paymentId":"",
   });
 
+ const handleRefresh = () => {
+    if (window.confirm("Are you sure you want to reset?")) {
+      window.location.reload();
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -126,7 +179,7 @@ const Home = () => {
           category.product.forEach(product => {
             if (product.id === productId) {
               product.quantity = quantity;
-              product.total_price = quantity * product.original_price;
+              product.total_price = quantity * product.selling_price;
             }
           });
 
@@ -170,7 +223,7 @@ const Home = () => {
     newpayload.TotalPayment = resPrice.grandTotal;
     newpayload.quantity = resPrice.grandQuantity;
 
-    axios.post('https://d2ab-103-175-108-215.ngrok-free.app/feed/order/', newpayload, {
+    axios.post('https://f891-103-175-108-236.ngrok-free.app/feed/order/', newpayload, {
       headers: {
         Accept: "application/json",
         "ngrok-skip-browser-warning": "98547",
@@ -196,8 +249,11 @@ const Home = () => {
           <button type="button" className="btn btn-outline-primary border me-3">
             Quantity: {resPrice.grandQuantity}
           </button>
-          <button type="button" className="btn btn-outline-primary border">
+          <button type="button" className="btn btn-outline-primary border me-3">
             Total price: ₹{resPrice.grandTotal}
+          </button>
+          <button type="button" className="btn btn-outline-primary border" onClick={handleRefresh}>
+          <FontAwesomeIcon icon={faSync} />
           </button>
         </div>
         <div></div>
@@ -281,17 +337,12 @@ const Home = () => {
             {category.category && <button type="button" className="btn btn-outline-primary mb-3 mt-5" style={{ width: "100%" }}>
               {category.category}
             </button>}
-            <div className="d-flex justify-content-center align-items-center">
+            <div>
               <div className="row g-5">
                 {category.product && category.product.map((item) => (
                   <div key={item.id} className="col-lg-4 col-md-6">
                     <div className="card rounded-0">
-                      <img
-                        src={`https://d2ab-103-175-108-215.ngrok-free.app${item.image}`}
-                        className="card-img-top rounded-0"
-                        alt="Card image"  
-                        style={{ height: "250px" }}
-                      />
+                      <ImageLoader imageUrl={`https://f891-103-175-108-236.ngrok-free.app${item.product_image}`} />
                       <div className="card-body">
                         <div className="card-text-container">
                           <p className="card-text">{item.title}</p>
@@ -341,6 +392,7 @@ const Home = () => {
                   style={{ height: "50vh" }}
                   className="img-fluid"
                   alt={`Image ${startIndex + index + 1}`}
+                  loading="lazy"
                 />
 
                 <div
