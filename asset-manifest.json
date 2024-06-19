@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Python_React_Ecom/static/css/main.ffa8570c.css",
-    "main.js": "/Python_React_Ecom/static/js/main.09117ea6.js",
+    "main.css": "/Python_React_Ecom/static/css/main.df5ae805.css",
+    "main.js": "/Python_React_Ecom/static/js/main.0c63c29e.js",
     "static/js/453.151daa23.chunk.js": "/Python_React_Ecom/static/js/453.151daa23.chunk.js",
     "index.html": "/Python_React_Ecom/index.html",
-    "main.ffa8570c.css.map": "/Python_React_Ecom/static/css/main.ffa8570c.css.map",
-    "main.09117ea6.js.map": "/Python_React_Ecom/static/js/main.09117ea6.js.map",
+    "main.df5ae805.css.map": "/Python_React_Ecom/static/css/main.df5ae805.css.map",
+    "main.0c63c29e.js.map": "/Python_React_Ecom/static/js/main.0c63c29e.js.map",
     "453.151daa23.chunk.js.map": "/Python_React_Ecom/static/js/453.151daa23.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ffa8570c.css",
-    "static/js/main.09117ea6.js"
+    "static/css/main.df5ae805.css",
+    "static/js/main.0c63c29e.js"
   ]
 }
